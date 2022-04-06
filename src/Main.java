@@ -6,27 +6,32 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CyclicBarrier;
+
+// основной класс main, в котором происходит запуск программы
 public class Main {
-    public static final int MIN_PORTS_PER_THREAD = 20;
-    public static final int MAX_THREADS = 0xFF;
+    // поля класса
+    public static final int MIN_PORTS_PER_THREAD = 20; // минимальное количество работающих потоков
+    public static final int MAX_THREADS = 0xFF; // максимальное количество работающих потоков
 
-    static InetAddress inetAddress;
-    static List<Integer> allPorts;
+    static InetAddress inetAddress; // ip
+    static List<Integer> allPorts; // список открытых портов
 
-    static List<Integer> allOpenPorts = new ArrayList<Integer>();
-    static List<PortScanWorker> workers = new ArrayList<PortScanWorker>(MAX_THREADS);
+    static List<Integer> allOpenPorts = new ArrayList<Integer>(); // динамический массив всех открытх портов
+    static List<PortScanWorker> workers = new ArrayList<PortScanWorker>(MAX_THREADS); // наши потоки
 
-    static Date startTime;
-    static Date endTime;
+    static Date startTime; // время начала исполнения программы
+    static Date endTime; // время завершения исполнения программы
 
     public static void main(String[] args) {
-        startTime = new Date();
+        startTime = new Date(); // старт времени
 
-        processArgs(args);
+        processArgs(args); // метод разбиения аргументов
 
+        // ограничение минималного количества портов на один поток
         if (allPorts.size() / MIN_PORTS_PER_THREAD > MAX_THREADS) {
             final int PORTS_PER_THREAD = allPorts.size() / MAX_THREADS;
 
+            // ----------создаем список потоков----------------------------------
             List<Integer> threadPorts = new ArrayList<Integer>();
             for (int i = 0, counter = 0; i < allPorts.size(); i++, counter++) {
                 if (counter < PORTS_PER_THREAD) {
@@ -63,45 +68,51 @@ public class Main {
             psw.setPorts(new ArrayList<Integer>(threadPorts));
             workers.add(psw);
         }
+        //-----------------------------------------------------------------------
 
-        System.out.println("Ports to scan: " + allPorts.size());
-        System.out.println("Threads to work: " + workers.size());
 
+        System.out.println("Ports to scan: " + allPorts.size()); // статистика сканирвоания всех портов
+        System.out.println("Threads to work: " + workers.size()); // количество потоков, которые это будут делать
+
+        // запускается после выполнения всех остальных потоков
         Runnable summarizer = new Runnable() {
             public void run() {
                 System.out.println("Scanning stopped...");
 
-                for (PortScanWorker psw : workers) {
+                for (PortScanWorker psw : workers) { // проход по списку потоков
                     List<Integer> openPorts = psw.getOpenPorts();
-                    allOpenPorts.addAll(openPorts);
+                    allOpenPorts.addAll(openPorts); // добавление всех элементов из allOpenPorts в open ports
                 }
 
-                Collections.sort(allOpenPorts);
+                Collections.sort(allOpenPorts); // сортируем
 
+                // выводим
                 System.out.println("List of opened ports:");
                 for (Integer openedPort : allOpenPorts) {
                     System.out.println(openedPort);
                 }
 
-                endTime = new Date();
+                endTime = new Date(); // конец времени программы
 
-                System.out.println("Time of run: " + (endTime.getTime() - startTime.getTime()) + " ms");
+                System.out.println("Time of run: " + (endTime.getTime() - startTime.getTime()) + " ms"); // вывод времени исполнения программы
             }
         };
 
+        //----------------------создаем барьер---------------------------------------------------
         CyclicBarrier barrier = new CyclicBarrier(workers.size(), summarizer);
 
-        for (PortScanWorker psw : workers) {
+        for (PortScanWorker psw : workers) { // барьер ставится на все сканеры
             psw.setBarrier(barrier);
         }
 
         System.out.println("Start scanning...");
 
         for (PortScanWorker psw : workers) {
-            new Thread(psw).start();
+            new Thread(psw).start(); // здесь наши потоки запускаются
         }
     }
-
+    //------------------------------------------------------------------------------------------------
+    //--разбиение аргументов. Тоисть это те параметры, которые мы вводим изначально в консоли--
     static void processArgs(String[] args) {
         if (args.length < 1) {
             usage();
@@ -143,6 +154,7 @@ public class Main {
                 }
             }
         }
+        //----------------------------------------------------------------------------------
 
         allPorts = new ArrayList<Integer>(maxPort - minPort + 1);
 
@@ -151,6 +163,7 @@ public class Main {
         }
     }
 
+    // гайд как пользоваться
     static void usage() {
         System.out.println("Java Port Scanner usage: ");
         System.out.println("java Main host port");
