@@ -1,4 +1,4 @@
-
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -22,7 +22,11 @@ public class Main {
     static Date startTime; // время начала исполнения программы
     static Date endTime; // время завершения исполнения программы
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
+        Date date = new Date();
+        // Вывод екущей даты и времени с использованием toString()
+        System.out.println(date.toString());
+
         startTime = new Date(); // старт времени
 
         processArgs(args); // метод разбиения аргументов
@@ -113,7 +117,7 @@ public class Main {
     }
     //------------------------------------------------------------------------------------------------
     //--разбиение аргументов. Тоисть это те параметры, которые мы вводим изначально в консоли--
-    static void processArgs(String[] args) {
+    static void processArgs(String[] args) throws FileNotFoundException {
         if (args.length < 1) {
             usage();
             System.exit(1);
@@ -162,7 +166,6 @@ public class Main {
             allPorts.add(i);
         }
     }
-
     // гайд как пользоваться
     static void usage() {
         System.out.println("Java Port Scanner usage: ");
@@ -172,5 +175,4 @@ public class Main {
         System.out.println("java Main 192.168.1.1 1099");
         System.out.println("java Main 192.168.1.1 (this scans all ports from 0 to 65535)");
     }
-
 }
