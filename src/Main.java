@@ -1,4 +1,4 @@
-import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -22,10 +22,10 @@ public class Main {
     static Date startTime; // время начала исполнения программы
     static Date endTime; // время завершения исполнения программы
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
         Date date = new Date();
         // Вывод екущей даты и времени с использованием toString()
-        System.out.println(date.toString());
+        System.out.println("Scan date: " + date.toString());
 
         startTime = new Date(); // старт времени
 
@@ -75,7 +75,7 @@ public class Main {
         //-----------------------------------------------------------------------
 
 
-        System.out.println("Ports to scan: " + allPorts.size()); // статистика сканирвоания всех портов
+        System.out.println("Ports to scan: " + allPorts.size()); // статистика сканирования всех портов
         System.out.println("Threads to work: " + workers.size()); // количество потоков, которые это будут делать
 
         // запускается после выполнения всех остальных потоков
@@ -115,9 +115,10 @@ public class Main {
             new Thread(psw).start(); // здесь наши потоки запускаются
         }
     }
+
     //------------------------------------------------------------------------------------------------
     //--разбиение аргументов. Тоисть это те параметры, которые мы вводим изначально в консоли--
-    static void processArgs(String[] args) throws FileNotFoundException {
+    static void processArgs(String[] args) throws IOException {
         if (args.length < 1) {
             usage();
             System.exit(1);
@@ -130,6 +131,7 @@ public class Main {
             System.out.println("Error when resolving host!");
             System.exit(2);
         }
+        FileWriter writer = new FileWriter(host);
 
         System.out.println("Scanning host " + host);
 
