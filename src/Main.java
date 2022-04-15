@@ -131,7 +131,6 @@ public class Main {
             System.out.println("Error when resolving host!");
             System.exit(2);
         }
-        FileWriter writer = new FileWriter(host);
 
         System.out.println("Scanning host " + host);
 
