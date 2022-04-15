@@ -1,5 +1,4 @@
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,13 +22,13 @@ public class Main {
     static Date endTime; // время завершения исполнения программы
 
     public static void main(String[] args) throws IOException {
-        Date date = new Date();
-        // Вывод екущей даты и времени с использованием toString()
-        System.out.println("Scan date: " + date.toString());
-
         startTime = new Date(); // старт времени
 
         processArgs(args); // метод разбиения аргументов
+
+        Date date = new Date();
+        // Вывод екущей даты и времени с использованием toString()
+        System.out.println("Scan date: " + date.toString());
 
         // ограничение минималного количества портов на один поток
         if (allPorts.size() / MIN_PORTS_PER_THREAD > MAX_THREADS) {
@@ -74,7 +73,6 @@ public class Main {
         }
         //-----------------------------------------------------------------------
 
-
         System.out.println("Ports to scan: " + allPorts.size()); // статистика сканирования всех портов
         System.out.println("Threads to work: " + workers.size()); // количество потоков, которые это будут делать
 
@@ -115,8 +113,8 @@ public class Main {
             new Thread(psw).start(); // здесь наши потоки запускаются
         }
     }
-
     //------------------------------------------------------------------------------------------------
+
     //--разбиение аргументов. Тоисть это те параметры, которые мы вводим изначально в консоли--
     static void processArgs(String[] args) throws IOException {
         if (args.length < 1) {
@@ -131,6 +129,8 @@ public class Main {
             System.out.println("Error when resolving host!");
             System.exit(2);
         }
+
+        PrintStream out = new PrintStream(new FileOutputStream(host + ".txt"));
 
         System.out.println("Scanning host " + host);
 
@@ -166,7 +166,9 @@ public class Main {
         for (int i = minPort; i <= maxPort; i++) {
             allPorts.add(i);
         }
+        System.setOut(out);
     }
+
     // гайд как пользоваться
     static void usage() {
         System.out.println("Java Port Scanner usage: ");
