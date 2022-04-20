@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.InetAddress;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -97,6 +98,7 @@ public class Main {
                 endTime = new Date(); // конец времени программы
 
                 System.out.println("Time of run: " + (endTime.getTime() - startTime.getTime()) + " ms"); // вывод времени исполнения программы
+                System.out.println("");
             }
         };
 
@@ -130,8 +132,7 @@ public class Main {
             System.exit(2);
         }
 
-        PrintStream out = new PrintStream(new FileOutputStream(host + ".txt"));
-
+        PrintStream out = new PrintStream(new FileOutputStream(host + ".txt", true));
         System.out.println("Scanning host " + host);
 
         int minPort = 0;
